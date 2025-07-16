@@ -52,16 +52,22 @@ app.use(async (req, res) => {
     const hostname = req.hostname;
     const subdomain = hostname.split('.')[0];
 
+    console.log('🔍 Host:', hostname);
+    console.log('🔍 Subdomain:', subdomain);
+
     let appType = await client.get(subdomain);
+    console.log('ℹ️ Redis appType:', appType);
 
     if (!appType) {
       appType = await getAppTypeFromDB(subdomain);
+      console.log('ℹ️ Fetched from API appType:', appType);
       if (appType) {
         await client.set(subdomain, appType, 'EX', 60 * 60 * 24 * 365); // 1 year
       }
     }
 
     if (!appType) {
+      console.log(`❌ Subdomain not found: ${subdomain}`);
       res.status(404).send('Application not found');
       return;
     }
@@ -106,4 +112,6 @@ proxy.on('proxyReq', (proxyReq, req, res) => {
 preloadAppTypes().then(() => {
 app.listen(PORT, () => console.log(`Reverse Proxy Running on port ${PORT}`));
 });
+
+module.exports = app;
   
