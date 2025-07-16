@@ -11,7 +11,7 @@ const httpAgent = new http.Agent({ keepAlive: true, maxSockets: 100 });
 const httpsAgent = new https.Agent({ keepAlive: true, maxSockets: 100 });
 
 const app = express()
-const PORT = process.env.PORT || 8000
+const PORT = process.env.PORT || 80
 
 const CDN_URL = process.env.CDN_URL;
 const API_SERVER_URL = process.env.API_SERVER_URL;
