@@ -17,7 +17,8 @@ const CDN_URL = process.env.CDN_URL;
 const API_SERVER_URL = process.env.API_SERVER_URL;
 const SERVERLESS_BASE_URL = process.env.SERVERLESS_BASE_URL;
 const S3_BUCKET_URL = process.env.S3_BUCKET_URL;
-const DYNAMIC_PROJECTS_URL = process.env.DYNAMIC_PROJECTS_URL
+const DYNAMIC_PROJECTS_URL = process.env.DYNAMIC_PROJECTS_URL;
+const PROJ1_URL = process.env.PROJ1_URL;
 
 const proxy = httpProxy.createProxy();
 
@@ -53,7 +54,7 @@ async function getAppTypeFromDB(subdomain) {
 app.use(async (req, res) => {
     const hostname = req.hostname;
 
-    if (hostname === 'app.localhost') {
+    if (hostname === 'app.hostrix.tech') {
       console.log('🔁 Routing app.hostrix.tech to S3 bucket');
 
       const targetUrl = S3_BUCKET_URL;
@@ -69,6 +70,24 @@ app.use(async (req, res) => {
       });
 
       return; 
+    }
+
+    if (hostname === PROJ1_URL+ '.localhost') {
+      console.log(`🔁  Routing ${PROJ1_URL}.hostrix.tech to Vercel`);
+
+      const targetUrl = `https://${PROJ1_URL}.vercel.app`;
+
+      proxy.web(req, res, {
+          target: targetUrl,
+          changeOrigin: true,
+          agent: httpsAgent,
+          headers: {
+              'X-Forwarded-For': req.ip,
+              'X-Real-IP': req.ip,
+          }
+      });
+
+      return;
   }
 
     const subdomain = hostname.split('.')[0];
